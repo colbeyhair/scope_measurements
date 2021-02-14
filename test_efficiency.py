@@ -5,6 +5,8 @@ import datetime
 import os
 import time
 
+seconds_since = lambda start_time: (datetime.datetime.now() - start_time).total_seconds()
+
 def main():
 
     log_file_name = datetime.datetime.now().strftime("log_%Y%m%d%H%M%S.csv")
@@ -36,7 +38,7 @@ def main():
     offset_values = [0,0,0,0]
     arg = None
     while arg != "q":
-        arg = input("\nq = quit\nc = calibrate\nblank = record data point\nenter your selection: ")
+        arg = input("\nq = quit\nc = calibrate\nblank = record data point\nt = interval recording (indefinitely)\nenter your selection: ")
         if arg == "q":
             break
 
@@ -65,9 +67,33 @@ def main():
                     calibration_complete = True
                     record_data_point(scope, offset_values)
 
+        elif arg == "t":
+            period_s = None
+            try:
+                period_s = float(input("Enter the time interval in seconds (0=flood): "))
+            except ValueError:
+                print("Unable to parse input. Try again.")
+
+            if period_s is not None:
+                try:
+                    if calibration_complete:
+                        record_points_timer(scope, offset_values, period_s)
+                except NameError:
+                    confirmation = input("WARNING: calibration not performed. Enter 'y' to use zero offset: ")
+                    if confirmation == "y":
+                        print("Using zero offset as default calibration.",flush=True)
+                        calibration_complete = True
+                        record_points_timer(scope, offset_values, period_s)
 
 
 
+def record_points_timer(scope, offset_values, period_s):
+    last_record_time = datetime.datetime.now()
+    while True:
+        while seconds_since(last_record_time) < period_s:
+            time.sleep(0.01)
+        last_record_time = datetime.datetime.now()
+        record_data_point(scope, offset_values)
 
 def setup_scope(scope):
     scope.set_high_resolution_mode()
@@ -120,7 +146,7 @@ def record_data_point(scope,offset_values):
 
     efficiency = power_out / power_in if np.abs(power_in) > 1e-3 else 0
 
-    log_data([
+    data_to_log = [
         datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S"),
         np.mean(voltage_in),
         np.mean(current_in),
@@ -129,7 +155,11 @@ def record_data_point(scope,offset_values):
         power_in,
         power_out,
         efficiency,
-        ])
+        ]
+
+    print("\n\n" + "\t".join(map(str,data_to_log)) + "\n", flush=True)
+
+    log_data(data_to_log)
 
 
 def log_data(data):
