@@ -79,3 +79,6 @@ Calibration must be performed once every time the script is launched. To perform
 
 After recording calibration data, operate the device. Enter a blank selection in the menu to record a single data point. Data will be logged to a CSV file using the time and date for enumeration.
 
+# References
+
+This script is sending SCPI commands to the scope. This is a general specification for command syntax, but the specific commands vary between device manufacturers (despite many common commands between manufacturers). The reference manual for the Rigol DS1000 series is availabl [here](https://www.batronix.com/pdf/Rigol/ProgrammingGuide/DS1000DE_ProgrammingGuide_EN.pdf).
