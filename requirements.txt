@@ -1,0 +1,7 @@
+numpy==1.20.1
+python-usbtmc==0.8
+PyVISA==1.11.3
+PyVISA-py==0.5.2
+-e git+git@github.com:colbeyhair/Rigol1000z.git@2eda9e0fe3da6eb880a7361decd8af27afa53c15#egg=Rigol1000z
+tqdm==4.56.2
+typing-extensions==3.7.4.3
